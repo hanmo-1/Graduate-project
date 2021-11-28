@@ -1,0 +1,16 @@
+.\obj\dac.o: ..\User\DAC.c
+.\obj\dac.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x.h
+.\obj\dac.o: ..\CMSIS\CoreSupport\core_cm3.h
+.\obj\dac.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\dac.o: ..\CMSIS\DeviceSupport\STM32F10x\system_stm32f10x.h
+.\obj\dac.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x_conf.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h
+.\obj\dac.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dac.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dma.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_fsmc.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_rcc.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_tim.h
+.\obj\dac.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
+.\obj\dac.o: ..\User\DAC.h

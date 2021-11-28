@@ -1,0 +1,17 @@
+.\Obj\oled.o: ..\User\oled.c
+.\Obj\oled.o: ..\User\oled.h
+.\Obj\oled.o: ..\User\sys.h
+.\Obj\oled.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x.h
+.\Obj\oled.o: ..\CMSIS\CoreSupport\core_cm3.h
+.\Obj\oled.o: C:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+.\Obj\oled.o: ..\CMSIS\DeviceSupport\STM32F10x\system_stm32f10x.h
+.\Obj\oled.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x_conf.h
+.\Obj\oled.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_exti.h
+.\Obj\oled.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x.h
+.\Obj\oled.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_fsmc.h
+.\Obj\oled.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h
+.\Obj\oled.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_pwr.h
+.\Obj\oled.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_rcc.h
+.\Obj\oled.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
+.\Obj\oled.o: C:\Keil\ARM\ARMCC\bin\..\include\stdlib.h
+.\Obj\oled.o: ..\User\delay.h

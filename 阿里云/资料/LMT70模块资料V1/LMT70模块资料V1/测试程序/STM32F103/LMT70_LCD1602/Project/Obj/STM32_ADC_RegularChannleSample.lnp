@@ -1,0 +1,21 @@
+--cpu Cortex-M3
+".\obj\main.o"
+".\obj\peripheralinit.o"
+".\obj\delay.o"
+".\obj\adcx_regularchannel.o"
+".\obj\charlcd.o"
+".\obj\misc.o"
+".\obj\stm32f10x_gpio.o"
+".\obj\stm32f10x_rcc.o"
+".\obj\stm32f10x_fsmc.o"
+".\obj\stm32f10x_adc.o"
+".\obj\stm32f10x_dma.o"
+".\obj\stm32f10x_tim.o"
+".\obj\stm32f10x_dac.o"
+".\obj\core_cm3.o"
+".\obj\system_stm32f10x.o"
+".\obj\startup_stm32f10x_hd.o"
+--library_type=microlib --strict --scatter ".\Obj\STM32_ADC_RegularChannleSample.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\List\STM32_ADC_RegularChannleSample.map" -o .\Obj\STM32_ADC_RegularChannleSample.axf

@@ -1,0 +1,5 @@
+--cpu Cortex-M3 "main.o" "delay.o" "peripheralinit.o" "ads1256.o" "stm32f10x_it.o" "usart.o" "lze_lcd.o" "misc.o" "stm32f10x_exti.o" "stm32f10x_fsmc.o" "stm32f10x_gpio.o" "stm32f10x_pwr.o" "stm32f10x_rcc.o" "stm32f10x_spi.o" "stm32f10x_usart.o" "core_cm3.o" "system_stm32f10x.o" ".\startup_stm32f10x_hd.o" 
+--library_type=microlib --strict --scatter "ADC_ADS1256.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\ADC_ADS1256.map" -o ADC_ADS1256.axf

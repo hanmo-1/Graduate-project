@@ -1,0 +1,80 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: μVision V5.21.1.0
+Copyright (C) 2016 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: lin dreg, jjkj, LIC=ATTQ1-CG440-EVZ1R-K7AEW-8NH0V-L3A1N
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.21a
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 3 (build 300)
+Assembler:       Armasm.exe V5.06 update 3 (build 300)
+Linker/Locator:  ArmLink.exe V5.06 update 3 (build 300)
+Library Manager: ArmAr.exe V5.06 update 3 (build 300)
+Hex Converter:   FromElf.exe V5.06 update 3 (build 300)
+CPU DLL:         SARMCM3.DLL V5.21a
+Dialog DLL:      DCM.DLL V1.13.8.0
+Target DLL:      Segger\JL2CM3.dll V2.99.23.0
+Dialog DLL:      TCM.DLL V1.14.14.0
+ 
+<h2>Project:</h2>
+H:\keil\毕业项目\压疮监测\keil下位机\硬件定时ADC模数转换实验多路选择\Template.uvprojx
+Project File Date:  05/07/2021
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 3 (build 300)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'Target 1'
+compiling time.c...
+"no source": Error:  #219: error while deleting file ".\obj\time_1.d": Permission denied
+APP\time\time.c: 0 warnings, 1 error
+compiling gizwits_protocol.c...
+Gizwits\gizwits_protocol.c(274): error:  #137: expression must be a modifiable lvalue
+  					devStatusTmp.valuePressure_signal = exchangeBytes(gizY2XFloat(
+ressure_signal_RATIO,  
+ressure_signal_ADDITION, dataPoints->valuePressure_signal[i]));     
+Gizwits\gizwits_protocol.c(280): error:  #137: expression must be a modifiable lvalue
+  					devStatusTmp.valueTemperature_signal = exchangeBytes(gizY2XFloat(
+emperature_signal_RATIO,  
+emperature_signal_ADDITION, dataPoints->valueTemperature_signal[i]));     
+Gizwits\gizwits_protocol.c(286): error:  #137: expression must be a modifiable lvalue
+  					devStatusTmp.valueHumidity = exchangeBytes(gizY2XFloat(
+umidity_RATIO,  
+umidity_ADDITION, dataPoints->valueHumidity[i]));     
+Gizwits\gizwits_protocol.c(147): warning:  #177-D: function "gizDataPoint2Event" was declared but never referenced
+  static int8_t ICACHE_FLASH_ATTR gizDataPoint2Event(uint8_t *issuedData, eventInfo_t *info, dataPoint_t *dataPoints)
+Gizwits\gizwits_protocol.c: 1 warning, 3 errors
+compiling main.c...
+.\APP\mux\mux.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif
+User\main.c(82): warning:  #177-D: variable "i" was declared but never referenced
+  	u8 i=0;
+User\main.c(83): warning:  #177-D: variable "value0" was declared but never referenced
+  	u16 value0=0,value1=0;
+User\main.c(83): warning:  #177-D: variable "value1" was declared but never referenced
+  	u16 value0=0,value1=0;
+User\main.c(84): warning:  #177-D: variable "vol0" was declared but never referenced
+  	float vol0,vol1;
+User\main.c(84): warning:  #177-D: variable "vol1" was declared but never referenced
+  	float vol0,vol1;
+User\main.c: 6 warnings, 0 errors
+compiling time.c...
+.\APP\mux\mux.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif
+APP\time\time.c(128): warning:  #177-D: variable "value" was declared but never referenced
+  		float value[144]; //?芄?144路8x16+8x1+8x1(压力+?露?+湿?龋?
+APP\time\time.c: 2 warnings, 0 errors
+".\Obj\Template.axf" - 3 Error(s), 9 Warning(s).
+
+<h2>Collection of Component include folders:</h2>
+  H:\keil\毕业项目\压疮监测\keil下位机\硬件定时ADC模数转换实验多路选择\RTE
+  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+Target not created.
+Build Time Elapsed:  00:00:10
+</pre>
+</body>
+</html>

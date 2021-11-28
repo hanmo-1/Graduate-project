@@ -1,0 +1,62 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: μVision V5.18.0.0
+Copyright (C) 2016 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: 123 1312, 31, LIC=P6F63-A4I3F-QIN5M-XPJT7-2TW51-PC3PB
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.18
+Toolchain Path:  d:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 1 (build 61)
+Assembler:       Armasm.exe V5.06 update 1 (build 61)
+Linker/Locator:  ArmLink.exe V5.06 update 1 (build 61)
+Library Manager: ArmAr.exe V5.06 update 1 (build 61)
+Hex Converter:   FromElf.exe V5.06 update 1 (build 61)
+CPU DLL:         SARMCM3.DLL V5.18
+Dialog DLL:      DCM.DLL V1.13.6.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V2.0.18.0
+Dialog DLL:      TCM.DLL V1.14.8.0
+ 
+<h2>Project:</h2>
+F:\实验室资料\32单片机\lmt70\Project\LMT70.uvproj
+Project File Date:  09/06/2020
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 1 (build 61)', folder: 'd:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'Target 1'
+compiling lze_lcd.c...
+lze_lcd.c(6): error:  #5: cannot open source input file "lze_lcd.h": No such file or directory
+  #include "lze_lcd.h"
+lze_lcd.c: 0 warnings, 1 error
+compiling Delay.c...
+Delay.c(5): error:  #5: cannot open source input file "Delay.h": No such file or directory
+  #include "Delay.h"
+Delay.c: 0 warnings, 1 error
+compiling main.c...
+main.c(5): error:  #5: cannot open source input file "lze_lcd.h": No such file or directory
+  #include "lze_lcd.h"
+main.c: 0 warnings, 1 error
+compiling PeripheralInit.c...
+PeripheralInit.c(5): error:  #5: cannot open source input file "lze_lcd.h": No such file or directory
+  #include "lze_lcd.h"
+PeripheralInit.c: 0 warnings, 1 error
+compiling ADCx_RegularChannel.c...
+ADCx_RegularChannel.c(2): error:  #5: cannot open source input file "ADCx_RegularChannel.h": No such file or directory
+  #include "ADCx_RegularChannel.h"
+ADCx_RegularChannel.c: 0 warnings, 1 error
+compiling core_cm3.c...
+compiling system_stm32f10x.c...
+compiling misc.c...
+compiling stm32f10x_adc.c...
+compiling stm32f10x_dma.c...
+compiling stm32f10x_gpio.c...
+compiling stm32f10x_rcc.c...
+".\Obj\LMT70.axf" - 5 Error(s), 0 Warning(s).
+Target not created.
+Build Time Elapsed:  00:00:06
+</pre>
+</body>
+</html>

@@ -1,0 +1,663 @@
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Output\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c COMPACT OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\main.lst) TABS(2) OBJECT(.\Output\main.obj)
+
+line level    source
+
+   1          //****************************************************************//
+   2          //  ±¾Àý³ÌÊÊÓÃÓÚAHT21B£¬AHT25£¬AM2301B£¬AM2108£¬AM2315C£¬DHT20,
+   3          //µ¥Æ¬»ú £ºSTC89C52RC 
+   4          // ¹¦ÄÜ  £º´®¿Ú·¢ËÍÎÂÊª¶ÈÊý¾Ý  ²¨ÌØÂÊ 9600 
+   5          // ¾§Õñ  £º11.0592Mhz (ÓÃ»§ÏµÍ³Ê±ÖÓÈç²»ÊÇ12M Çë¸ü¸ÄÏà¹Øºê¶¨Òå¼°×¢ÊÍµÄÑÓÊ±Ê±¼ä)
+   6          // ±àÒë»·¾³:  Keil5
+   7          // ¹«Ë¾  £º°ÂËÉµç×Ó    
+   8          //****************************************************************//
+   9          
+  10          #include "stdio.h"
+  11          #include "reg52.h"
+  12          #include <intrins.h>
+  13          
+  14          typedef unsigned char u8;
+  15          typedef unsigned int u16;
+  16          typedef unsigned long int u32;
+  17          
+  18          
+  19          //¶¨ÒåIICÒý½Å
+  20          sbit SDA=P0^0;
+  21          sbit SCL=P0^1;
+  22          
+  23          char buffer[100]={0};//´®¿Ú´òÓ¡µÄ»º´æ
+  24          u8  CTDATA[7]={0};//ÓÃÓÚCRC´«µÝÊý×é
+  25          u8 CRC_WrongFlag=0;//CRC´íÎó±êÖ¾Î»   1:Wrong,0:True
+  26          u8 ACK_Flag=0;//Ó¦´ð±êÖ¾Î»   1:ACK,0:NACK
+  27          
+  28          
+  29          
+  30          /**************************ÑÓÊ±²¿·Ö*****************************
+  31          ÓÃÂß¼­·ÖÎöÒÇ²âµÃ:1¸önop:6us, 2¸öNop:7us, 3¸öNop:8.5us, 4¸öNop:9.5us,
+  32                          5¸öNop:10.5us, 6¸öNop:11.5us
+  33          ****************************************************************/
+  34          void delay_10us()//ÑÓÊ±10us
+  35          {
+  36   1        _nop_(); _nop_(); _nop_(); 
+  37   1        _nop_(); _nop_();
+  38   1      }
+  39          
+  40          //**********************************************
+  41          void delay_1ms()    //ÑÓÊ±1ms£¬ÓÃÂß¼­·ÖÎöÒÇ²âµÃi=84Ê±£¬ÑÓÊ±Îª1ms
+  42          {
+  43   1        u8 i;
+  44   1        for(i=84;i>0;i--)
+  45   1        {
+  46   2          delay_10us();
+  47   2        }
+  48   1      }
+  49          
+  50          
+  51          
+  52          //**********************************************
+  53          void delay_ms(u16 i)  //ÑÓÊ± i ms£¬²»ÊÇÊ®·Ö¾«×¼£¬µ±i´óÓÚ58Ê±Îó²î»á³¬¹ý1ms
+  54          {
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 2   
+
+  55   1        for(;i>0;i--)
+  56   1        {
+  57   2          delay_1ms();
+  58   2        }
+  59   1      }
+  60          
+  61          
+  62          
+  63          
+  64          
+  65          
+  66          /**************************´®¿Ú²¿·Ö*****************************/
+  67          
+  68          void UART_init(void)  //´®¿Ú³õÊ¼»¯
+  69          {
+  70   1        //ÏÂÃæ´úÂëÉèÖÃ¶¨Ê±Æ÷ 1
+  71   1        TMOD = 0x20;     //0010 0000 ¶¨Ê±Æ÷ 1 ¹¤×÷ÓÚ·½Ê½ 2£¨8 Î»×Ô¶¯ÖØ×°·½Ê½£©
+  72   1        TH1 = 0xFD;     //²¨ÌØÂÊ£º 9600 /11.0592MHZ
+  73   1        TL1 = 0xFD;     //²¨ÌØÂÊ£º 9600 /11.0592MHZ
+  74   1        TR1 = 1;
+  75   1        
+  76   1        //ÏÂÃæ´úÂëÉèÖÃ¶¨´®¿Ú
+  77   1        SCON = 0x50;    //01010 0000 SM0.SM1=01(×îÆÕ±éµÄ 8 Î»Í¨ÐÅ£© ,REN=1£¨ÔÊÐí½ÓÊÜ£©
+  78   1        ES = 1;         //¹Ø¼ü£º¿ªÆôÁËÖÐ¶Ï¾Í±ØÐë±àÐ´ÏàÓ¦µÄÖÐ¶Ïº¯Êý£¬ÄÄÅÂÊÇÖÐ¶Ï¿Õº¯Êý£¬
+  79   1                        //µ«±ØÐëÓÐ,·ñÔò³ÌÐò½øÈëÖÐ¶ÏÈë¿ÚµØÖ·ºó£¨ÕâÀïÊÇ 0023H)²»ÄÜÌø³ö£¬±ØÈ»³ö´í
+  80   1        EA = 1;
+  81   1        
+  82   1      }
+  83          
+  84          
+  85          //**********************************************
+  86          //´®¿Ú·¢ËÍ
+  87          void UARTSend(char UCHAR)
+  88          {
+  89   1         SBUF=UCHAR;
+  90   1        while(TI==0);
+  91   1        TI=0;
+  92   1      }
+  93          
+  94          
+  95          
+  96          //**********************************************
+  97          void UARTRead(void) interrupt 4
+  98          {
+  99   1        char temp;
+ 100   1        if(RI)
+ 101   1        {
+ 102   2          RI=0;
+ 103   2          temp = SBUF;
+ 104   2        }
+ 105   1      }
+ 106          
+ 107          
+ 108          //**********************************************
+ 109          void UART_PutString(unsigned char *buf )//´®¿Ú·¢ËÍ×Ö·û´®
+ 110          {
+ 111   1        while(*buf)
+ 112   1            UARTSend(*buf++);
+ 113   1      } 
+ 114          
+ 115          
+ 116          
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 3   
+
+ 117          
+ 118          
+ 119          /**********************************************
+ 120          //´®¿Ú´òÓ¡IIC½ÓÊÕµ½µÄ7¸ö×Ö½ÚÊý¾Ý£¨16½øÖÆÊý£©
+ 121          **********************************************/
+ 122          void UART_Data(unsigned char *buf ,unsigned char *bufdata)
+ 123          {
+ 124   1        unsigned char a[2],i,j;
+ 125   1        
+ 126   1        UART_PutString("IIC_data: ");
+ 127   1        for(i=0;i<7;i++)
+ 128   1        {
+ 129   2          a[0] = bufdata[i]/16; 
+ 130   2          a[1] = bufdata[i]%16;
+ 131   2          for(j=0;j<2;j++)
+ 132   2          {
+ 133   3            if(a[j]>9)
+ 134   3            {
+ 135   4              a[j] = (a[j]-10)+'A';
+ 136   4            }
+ 137   3            else
+ 138   3            {
+ 139   4              a[j] = a[j]+'0';
+ 140   4            }
+ 141   3            UARTSend(a[j]);
+ 142   3          }
+ 143   2          UARTSend(' ');
+ 144   2        } 
+ 145   1          UARTSend('\n');
+ 146   1      }
+*** WARNING C280 IN LINE 122 OF MAIN.C: 'buf': unreferenced local variable
+ 147          
+ 148          
+ 149          
+ 150          
+ 151          
+ 152          
+ 153          /**************************IIC²¿·Ö*****************************/
+ 154          
+ 155          //ËÍÆðÊ¼Î» sda=1->0
+ 156          void I2C_Start()
+ 157          {
+ 158   1        SDA=1;
+ 159   1        SCL=1;
+ 160   1        delay_10us();
+ 161   1        SDA=0;
+ 162   1        delay_10us();
+ 163   1        SCL=0; 
+ 164   1      }
+ 165          //ËÍÍ£Ö¹Î» sda=0->1
+ 166          void Stop_I2C()
+ 167          {
+ 168   1        SDA=0;
+ 169   1        SCL=1;
+ 170   1        delay_10us();
+ 171   1        SDA=1;
+ 172   1      }
+ 173          //Ö÷»ú·¢ËÍACK(°üº¬ack:sda=0)
+ 174          void Send_ACK(void)
+ 175          {  //ÉèÖÃSDA ¿ÚÎªÊä³ö
+ 176   1         SDA=0;
+ 177   1         SCL=0;
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 4   
+
+ 178   1         delay_10us();
+ 179   1         SCL=1;
+ 180   1         delay_10us();  
+ 181   1         SCL=0;
+ 182   1         SDA=1;
+ 183   1      }
+ 184          //Ö÷»ú·¢ËÍNACK(no_ack:sda=1£©
+ 185          void Send_NOT_ACK(void)
+ 186          {  //ÉèÖÃSDA ¿ÚÎªÊä³ö
+ 187   1         SDA=1;  
+ 188   1         SCL=0;
+ 189   1         delay_10us();
+ 190   1         SCL=1;
+ 191   1         delay_10us();
+ 192   1         SDA=1;
+ 193   1         SCL=0;
+ 194   1      }
+ 195          
+ 196          // ¼ì²â SDAÊÇ·ñ»ØACK£¨ack:sda=1£»Nack:sda=0£©
+ 197          u8 Receive_ACK(void)
+ 198          {  //ÉèÖÃSDA ¿ÚÎªÊäÈë
+ 199   1        u8 cnt=0;
+ 200   1         SCL=0;
+ 201   1         delay_10us();
+ 202   1         SCL=1;
+ 203   1         delay_10us();
+ 204   1        while((SDA==1)&&cnt<100)
+ 205   1          cnt++;
+ 206   1        if(cnt==100)
+ 207   1        {
+ 208   2          ACK_Flag=0;//nack
+ 209   2        }else
+ 210   1        {
+ 211   2          ACK_Flag=1;//ack
+ 212   2        }
+ 213   1        SCL=0;
+ 214   1        delay_10us();
+ 215   1         return ACK_Flag;
+ 216   1      }
+ 217          
+ 218          
+ 219          
+ 220          
+ 221          
+ 222          
+ 223          void AHT20_WR_Byte(u8 Byte) //ÍùAHT20Ð´Ò»¸ö×Ö½Ú
+ 224          {
+ 225   1        u8 Data,N,i;  
+ 226   1        Data=Byte;
+ 227   1        i = 0x80;
+ 228   1        for(N=0;N<8;N++)
+ 229   1        {
+ 230   2          SCL=0; 
+ 231   2          delay_10us(); 
+ 232   2          if(i&Data)
+ 233   2          {
+ 234   3            SDA=1;
+ 235   3          }
+ 236   2          else
+ 237   2          {
+ 238   3            SDA=0;
+ 239   3          } 
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 5   
+
+ 240   2          SCL=1;
+ 241   2          delay_10us();
+ 242   2          Data <<= 1;
+ 243   2           
+ 244   2        }
+ 245   1        SCL=0;
+ 246   1        delay_10us();   
+ 247   1      } 
+ 248          
+ 249          
+ 250          u8 AHT20_RD_Byte(void)//´ÓAHT20¶ÁÈ¡Ò»¸ö×Ö½Ú
+ 251          {
+ 252   1        u8 Byte,i,a;
+ 253   1        Byte = 0;
+ 254   1        
+ 255   1        for(i=0;i<8;i++)
+ 256   1        {
+ 257   2          SCL=0;
+ 258   2          delay_10us();
+ 259   2          SCL=1;
+ 260   2          delay_10us();
+ 261   2          a=0;
+ 262   2          if(SDA==1)a=1;
+ 263   2          Byte=(Byte<<1);
+ 264   2          Byte|=a;
+ 265   2          SCL=0;
+ 266   2          
+ 267   2        }
+ 268   1        return Byte;
+ 269   1        
+ 270   1        
+ 271   1        
+ 272   1      }
+ 273          
+ 274          
+ 275          
+ 276          
+ 277          u8 AHT20_Read_Status(void)//¶ÁÈ¡AHT20µÄ×´Ì¬¼Ä´æÆ÷
+ 278          {
+ 279   1      
+ 280   1        u8 Byte_first;  
+ 281   1        I2C_Start();
+ 282   1        AHT20_WR_Byte(0x71);
+ 283   1        
+ 284   1        Receive_ACK();
+ 285   1        Byte_first = AHT20_RD_Byte();
+ 286   1        Send_NOT_ACK();
+ 287   1        Stop_I2C();
+ 288   1        return Byte_first;
+ 289   1      }
+ 290          
+ 291          u8 AHT20_Read_Cal_Enable(void)  //²éÑ¯cal enableÎ»ÓÐÃ»ÓÐÊ¹ÄÜ
+ 292          {
+ 293   1        u8 val = 0;//ret = 0,
+ 294   1        val = AHT20_Read_Status();
+ 295   1         if((val & 0x68)==0x08)
+ 296   1           return 1;
+ 297   1         else  return 0;
+ 298   1       }
+ 299          
+ 300          void AHT20_SendAC(void) //ÏòAHT20·¢ËÍACÃüÁî
+ 301          {
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 6   
+
+ 302   1      
+ 303   1        I2C_Start();
+ 304   1        AHT20_WR_Byte(0x70);
+ 305   1        Receive_ACK();
+ 306   1        AHT20_WR_Byte(0xac);//0xAC²É¼¯ÃüÁî
+ 307   1        Receive_ACK();
+ 308   1        AHT20_WR_Byte(0x33);
+ 309   1        Receive_ACK();
+ 310   1        AHT20_WR_Byte(0x00);
+ 311   1        Receive_ACK();
+ 312   1        Stop_I2C();
+ 313   1      
+ 314   1      }
+ 315          
+ 316          
+ 317          //CRCÐ£ÑéÀàÐÍ£ºCRC8/MAXIM
+ 318          //¶àÏîÊ½£ºX8+X5+X4+1
+ 319          //Poly£º0011 0001  0x31
+ 320          //¸ßÎ»·Åµ½ºóÃæ¾Í±ä³É 1000 1100 0x8c
+ 321          //CÏÖÊµ´úÂë£º
+ 322          u8 Calc_CRC8(u8 *message,u8 Num)
+ 323          {
+ 324   1              u8 i;
+ 325   1              u8 byte;
+ 326   1              u8 crc=0xFF;
+ 327   1        for(byte=0; byte<Num; byte++)
+ 328   1        {
+ 329   2          crc^=(message[byte]);
+ 330   2          for(i=8;i>0;--i)
+ 331   2          {
+ 332   3            if(crc&0x80) crc=(crc<<1)^0x31;
+ 333   3            else crc=(crc<<1);
+ 334   3          }
+ 335   2        }
+ 336   1              return crc;
+ 337   1      }
+ 338          
+ 339          
+ 340          
+ 341          
+ 342          
+ 343          void AHT20_Read_CTdata(u32 *ct) //Ã»ÓÐCRCÐ£Ñé£¬Ö±½Ó¶ÁÈ¡AHT20µÄÎÂ¶ÈºÍÊª¶ÈÊý¾Ý
+ 344          {
+ 345   1        volatile u8  Byte_1th=0;
+ 346   1        volatile u8  Byte_2th=0;
+ 347   1        volatile u8  Byte_3th=0;
+ 348   1        volatile u8  Byte_4th=0;
+ 349   1        volatile u8  Byte_5th=0;
+ 350   1        volatile u8  Byte_6th=0;
+ 351   1        volatile u8  Byte_7th=0;
+ 352   1         u32 RetuData = 0;
+ 353   1        u16 cnt = 0;
+ 354   1        AHT20_SendAC();//ÏòAHT10·¢ËÍACÃüÁî
+ 355   1        delay_ms(80);//ÑÓÊ±80ms×óÓÒ 
+ 356   1          cnt = 0;
+ 357   1        while(((AHT20_Read_Status()&0x80)==0x80))//Ö±µ½×´Ì¬bit[7]Îª0£¬±íÊ¾Îª¿ÕÏÐ×´Ì¬£¬ÈôÎª1£¬±íÊ¾Ã¦×´Ì¬
+ 358   1        {
+ 359   2          delay_ms(2);
+ 360   2          if(cnt++>=100)
+ 361   2          {
+ 362   3           break;
+ 363   3           }
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 7   
+
+ 364   2        }
+ 365   1        I2C_Start();
+ 366   1        AHT20_WR_Byte(0x71);
+ 367   1        Receive_ACK();
+ 368   1        CTDATA[0]=Byte_1th = AHT20_RD_Byte();//×´Ì¬×Ö£¬²éÑ¯µ½×´Ì¬Îª0x98,±íÊ¾ÎªÃ¦×´Ì¬£¬bit[7]Îª1£»×´Ì¬Îª0x1C£¬»òÕß
+             -0x0C£¬»òÕß0x08±íÊ¾Îª¿ÕÏÐ×´Ì¬£¬bit[7]Îª0
+ 369   1        Send_ACK();
+ 370   1        CTDATA[1]=Byte_2th = AHT20_RD_Byte();//Êª¶È
+ 371   1        Send_ACK();
+ 372   1        CTDATA[2]=Byte_3th = AHT20_RD_Byte();//Êª¶È
+ 373   1        Send_ACK();
+ 374   1        CTDATA[3]=Byte_4th = AHT20_RD_Byte();//Êª¶È/ÎÂ¶È
+ 375   1        Send_ACK();
+ 376   1        CTDATA[4]=Byte_5th = AHT20_RD_Byte();//ÎÂ¶È
+ 377   1        Send_ACK();
+ 378   1        CTDATA[5]=Byte_6th = AHT20_RD_Byte();//ÎÂ¶È
+ 379   1        Send_NOT_ACK();
+ 380   1        Stop_I2C();
+ 381   1      
+ 382   1        RetuData = (RetuData|Byte_2th)<<8;
+ 383   1        RetuData = (RetuData|Byte_3th)<<8;
+ 384   1        RetuData = (RetuData|Byte_4th);
+ 385   1        RetuData =RetuData >>4;
+ 386   1        ct[0] = RetuData;//Êª¶È
+ 387   1        RetuData = 0;
+ 388   1        RetuData = (RetuData|Byte_4th)<<8;
+ 389   1        RetuData = (RetuData|Byte_5th)<<8;
+ 390   1        RetuData = (RetuData|Byte_6th);
+ 391   1        RetuData = RetuData&0xfffff;
+ 392   1        ct[1] =RetuData; //ÎÂ¶È
+ 393   1        
+ 394   1      
+ 395   1      }
+ 396          
+ 397          
+ 398          void AHT20_Read_CTdata_crc(u32 *ct) //CRCÐ£Ñéºó£¬¶ÁÈ¡AHT20µÄÎÂ¶ÈºÍÊª¶ÈÊý¾Ý
+ 399          {
+ 400   1        volatile u8  Byte_1th=0;
+ 401   1        volatile u8  Byte_2th=0;
+ 402   1        volatile u8  Byte_3th=0;
+ 403   1        volatile u8  Byte_4th=0;
+ 404   1        volatile u8  Byte_5th=0;
+ 405   1        volatile u8  Byte_6th=0;
+ 406   1        volatile u8  Byte_7th=0;
+ 407   1         u32 RetuData = 0;
+ 408   1         u16 cnt = 0;
+ 409   1      
+ 410   1        
+ 411   1        AHT20_SendAC();//ÏòAHT10·¢ËÍACÃüÁî
+ 412   1        delay_ms(80);//ÑÓÊ±80ms×óÓÒ 
+ 413   1          cnt = 0;
+ 414   1        while(((AHT20_Read_Status()&0x80)==0x80))//Ö±µ½×´Ì¬bit[7]Îª0£¬±íÊ¾Îª¿ÕÏÐ×´Ì¬£¬ÈôÎª1£¬±íÊ¾Ã¦×´Ì¬
+ 415   1        {
+ 416   2          delay_ms(1);
+ 417   2          if(cnt++>=100)
+ 418   2          {
+ 419   3           break;
+ 420   3          }
+ 421   2        }
+ 422   1        
+ 423   1        I2C_Start();
+ 424   1      
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 8   
+
+ 425   1        AHT20_WR_Byte(0x71);
+ 426   1        Receive_ACK();
+ 427   1        CTDATA[0]=Byte_1th = AHT20_RD_Byte();//×´Ì¬×Ö£¬²éÑ¯µ½×´Ì¬Îª0x98,±íÊ¾ÎªÃ¦×´Ì¬£¬bit[7]Îª1£»×´Ì¬Îª0x1C£¬»òÕß
+             -0x0C£¬»òÕß0x08±íÊ¾Îª¿ÕÏÐ×´Ì¬£¬bit[7]Îª0
+ 428   1        Send_ACK();
+ 429   1        CTDATA[1]=Byte_2th = AHT20_RD_Byte();//Êª¶È
+ 430   1        Send_ACK();
+ 431   1        CTDATA[2]=Byte_3th = AHT20_RD_Byte();//Êª¶È
+ 432   1        Send_ACK();
+ 433   1        CTDATA[3]=Byte_4th = AHT20_RD_Byte();//Êª¶È/ÎÂ¶È
+ 434   1        Send_ACK();
+ 435   1        CTDATA[4]=Byte_5th = AHT20_RD_Byte();//ÎÂ¶È
+ 436   1        Send_ACK();
+ 437   1        CTDATA[5]=Byte_6th = AHT20_RD_Byte();//ÎÂ¶È
+ 438   1        Send_ACK();
+ 439   1        CTDATA[6]=Byte_7th = AHT20_RD_Byte();//CRCÊý¾Ý
+ 440   1        Send_NOT_ACK();                           //×¢Òâ: ×îºóÊÇ·¢ËÍNAK
+ 441   1        Stop_I2C();
+ 442   1        
+ 443   1        if(Calc_CRC8(CTDATA,6)==Byte_7th)
+ 444   1        {
+ 445   2        CRC_WrongFlag=0;
+ 446   2          
+ 447   2        RetuData = (RetuData|Byte_2th)<<8;
+ 448   2        RetuData = (RetuData|Byte_3th)<<8;
+ 449   2        RetuData = (RetuData|Byte_4th);
+ 450   2        RetuData =RetuData >>4;
+ 451   2        ct[0] = RetuData;//Êª¶È
+ 452   2        RetuData = 0;
+ 453   2        RetuData = (RetuData|Byte_4th)<<8;
+ 454   2        RetuData = (RetuData|Byte_5th)<<8;
+ 455   2        RetuData = (RetuData|Byte_6th);
+ 456   2        RetuData = RetuData&0xfffff;
+ 457   2        ct[1] =RetuData; //ÎÂ¶È
+ 458   2          
+ 459   2        }
+ 460   1        else
+ 461   1        {
+ 462   2      //    ct[0]=0x00;
+ 463   2      //    ct[1]=0x00;//Ð£Ñé´íÎó·µ»ØÖµ£¬¿Í»§¿ÉÒÔ¸ù¾Ý×Ô¼ºÐèÒª¸ü¸Ä
+ 464   2          CRC_WrongFlag=1;//CRC´íÎó±êÖ¾Î»
+ 465   2      
+ 466   2        }//CRCÊý¾Ý
+ 467   1      }
+ 468          
+ 469          
+ 470          void AHT20_Init(void)   //³õÊ¼»¯AHT20
+ 471          { 
+ 472   1        I2C_Start();
+ 473   1        AHT20_WR_Byte(0x70);
+ 474   1        Receive_ACK();
+ 475   1        AHT20_WR_Byte(0xa8);//0xA8½øÈëNOR¹¤×÷Ä£Ê½
+ 476   1        Receive_ACK();
+ 477   1        AHT20_WR_Byte(0x00);
+ 478   1        Receive_ACK();
+ 479   1        AHT20_WR_Byte(0x00);
+ 480   1        Receive_ACK();
+ 481   1        Stop_I2C();
+ 482   1      
+ 483   1        delay_ms(10);//ÑÓÊ±10ms×óÓÒ
+ 484   1      
+ 485   1        I2C_Start();
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 9   
+
+ 486   1        AHT20_WR_Byte(0x70);
+ 487   1        Receive_ACK();
+ 488   1        AHT20_WR_Byte(0xbe);//0xBE³õÊ¼»¯ÃüÁî£¬AHT20µÄ³õÊ¼»¯ÃüÁîÊÇ0xBE,   AHT10µÄ³õÊ¼»¯ÃüÁîÊÇ0xE1
+ 489   1        Receive_ACK();
+ 490   1        AHT20_WR_Byte(0x08);//Ïà¹Ø¼Ä´æÆ÷bit[3]ÖÃ1£¬ÎªÐ£×¼Êä³ö
+ 491   1        Receive_ACK();
+ 492   1        AHT20_WR_Byte(0x00);
+ 493   1        Receive_ACK();
+ 494   1        Stop_I2C();
+ 495   1        delay_ms(10);//ÑÓÊ±10ms×óÓÒ
+ 496   1      }
+ 497          void JH_Reset_REG(u8 addr)
+ 498          {
+ 499   1        
+ 500   1        u8 Byte_first,Byte_second,Byte_third;
+ 501   1        I2C_Start();
+ 502   1        AHT20_WR_Byte(0x70);//Ô­À´ÊÇ0x70
+ 503   1        Receive_ACK();
+ 504   1        AHT20_WR_Byte(addr);
+ 505   1        Receive_ACK();
+ 506   1        AHT20_WR_Byte(0x00);
+ 507   1        Receive_ACK();
+ 508   1        AHT20_WR_Byte(0x00);
+ 509   1        Receive_ACK();
+ 510   1        Stop_I2C();
+ 511   1      
+ 512   1        delay_ms(5);//ÑÓÊ±5ms×óÓÒ
+ 513   1        I2C_Start();
+ 514   1        AHT20_WR_Byte(0x71);//
+ 515   1        Receive_ACK();
+ 516   1        Byte_first = AHT20_RD_Byte();
+ 517   1        Send_ACK();
+ 518   1        Byte_second = AHT20_RD_Byte();
+ 519   1        Send_ACK();
+ 520   1        Byte_third = AHT20_RD_Byte();
+ 521   1        Send_NOT_ACK();
+ 522   1        Stop_I2C();
+ 523   1        
+ 524   1          delay_ms(10);//ÑÓÊ±10ms×óÓÒ
+ 525   1        I2C_Start();
+ 526   1        AHT20_WR_Byte(0x70);///
+ 527   1        Receive_ACK();
+ 528   1        AHT20_WR_Byte(0xB0|addr);////¼Ä´æÆ÷ÃüÁî
+ 529   1        Receive_ACK();
+ 530   1        AHT20_WR_Byte(Byte_second);
+ 531   1        Receive_ACK();
+ 532   1        AHT20_WR_Byte(Byte_third);
+ 533   1        Receive_ACK();
+ 534   1        Stop_I2C();
+ 535   1        
+ 536   1        Byte_second=0x00;
+ 537   1        Byte_third =0x00;
+ 538   1      }
+ 539          
+ 540          void AHT20_Start_Init(void)
+ 541          {
+ 542   1        JH_Reset_REG(0x1b);
+ 543   1        JH_Reset_REG(0x1c);
+ 544   1        JH_Reset_REG(0x1e);
+ 545   1      }
+ 546          
+ 547          
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 10  
+
+ 548          
+ 549          
+ 550          
+ 551          
+ 552          
+ 553          int main()
+ 554          {
+ 555   1        u32 CT_data[2];
+ 556   1        volatile float  c1,t1;
+ 557   1      
+ 558   1        UART_init();
+ 559   1        delay_ms(500);//¢Ù¸ÕÉÏµç£¬²úÆ·Ð¾Æ¬ÄÚ²¿¾ÍÐ÷ÐèÒªÊ±¼ä£¬ÑÓÊ±100~500ms,½¨Òé500ms
+ 560   1      
+ 561   1        if((AHT20_Read_Status()&0x18)!=0x18)//¢ÚÉÏµçµÚÒ»´Î·¢0x71¶ÁÈ¡×´Ì¬×Ö£¬ÅÐ¶Ï×´Ì¬×ÖÊÇ·ñÎª0x18,Èç¹û²»ÊÇ0x18,½øÐ
+             -Ð¼Ä´æÆ÷³õÊ¼»¯
+ 562   1        {
+ 563   2        AHT20_Start_Init(); //ÖØÐÂ³õÊ¼»¯¼Ä´æÆ÷
+ 564   2        delay_ms(10);
+ 565   2        }
+ 566   1        
+ 567   1      
+ 568   1        while(1)//¢Û¸ù¾Ý¿Í»§×Ô¼ºÐèÇó·¢²âÁ¿ÃüÁî¶ÁÈ¡ÎÂÊª¶ÈÊý¾Ý£¬µ±Ç°while£¨1£©Ñ­»··¢²âÁ¿ÃüÁî¶ÁÈ¡ÎÂÊª¶ÈÊý¾Ý£¬½ö¹©²Î¿
+             -¼
+ 569   1        {
+ 570   2      //   AHT20_Read_CTdata(CT_data);       //²»¾­¹ýCRCÐ£Ñé£¬Ö±½Ó¶ÁÈ¡AHT20µÄÎÂ¶ÈºÍÊª¶ÈÊý¾Ý    ÍÆ¼öÃ¿¸ô´óÓÚ1S¶ÁÒ»
+             -´Î
+ 571   2         AHT20_Read_CTdata_crc(CT_data);  //crcÐ£Ñéºó£¬¶ÁÈ¡AHT20µÄÎÂ¶ÈºÍÊª¶ÈÊý¾Ý 
+ 572   2        
+ 573   2      
+ 574   2         c1 = ((float)CT_data[0]/1024/1024)*100;  //¼ÆËãµÃµ½Êª¶ÈÖµc1·Å´ó10±¶
+ 575   2         t1 = ((float)CT_data[1]/1024/1024)*200-50;//¼ÆËãµÃµ½ÎÂ¶ÈÖµt1·Å´ó10±¶
+ 576   2          
+ 577   2          
+ 578   2          
+ 579   2          
+ 580   2          
+ 581   2        ////ÏÂÒ»²½¿Í»§´¦ÀíÏÔÊ¾Êý¾Ý£¬
+ 582   2          
+ 583   2          if(ACK_Flag==0)//ÅÐ¶ÏÊÇ·ñÓÐÓ¦´ð£¬0ÎªÎÞÓ¦´ð
+ 584   2          {
+ 585   3          UART_PutString("No Connected! \r\n");
+ 586   3          }
+ 587   2          else if(CRC_WrongFlag==0)//ÅÐ¶ÏCRCÐ£ÑéÊÇ·ñÕýÈ·
+ 588   2          {
+ 589   3          sprintf(buffer,"ÎÂ¶È:%.2f \r\nÊª¶È:%.2f%%\r\n",t1,c1);//´®¿Ú´òÓ¡ÎÂÊª¶ÈÊý¾Ý
+ 590   3          UART_PutString(buffer);
+ 591   3          UART_Data(buffer,CTDATA);
+ 592   3          }
+ 593   2          else//CRCÐ£ÑéÊ§°Ü
+ 594   2          {
+ 595   3          UART_PutString("CRC Wrong!\r\n");
+ 596   3          UART_Data(buffer,CTDATA);
+ 597   3          }
+ 598   2          
+ 599   2          delay_ms(2000);
+ 600   2         }
+ 601   1      
+ 602   1      }
+ 603          
+ 604          
+ 605          
+ 606          
+C51 COMPILER V9.01   MAIN                                                                  09/29/2021 16:17:02 PAGE 11  
+
+ 607          
+ 608          
+ 609          
+ 610          
+ 611          
+ 612          
+ 613          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1952    ----
+   CONSTANT SIZE    =     67    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =    109      61
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

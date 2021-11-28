@@ -1,0 +1,12 @@
+.\gizwits_protocol.o: ..\Gizwits\gizwits_protocol.c
+.\gizwits_protocol.o: ..\Utils\ringBuffer.h
+.\gizwits_protocol.o: D:\keil5\ARM\ARMCC\bin\..\include\stdint.h
+.\gizwits_protocol.o: D:\keil5\ARM\ARMCC\bin\..\include\stdio.h
+.\gizwits_protocol.o: D:\keil5\ARM\ARMCC\bin\..\include\stdlib.h
+.\gizwits_protocol.o: D:\keil5\ARM\ARMCC\bin\..\include\string.h
+.\gizwits_protocol.o: ..\Gizwits\gizwits_product.h
+.\gizwits_protocol.o: ..\Gizwits\gizwits_protocol.h
+.\gizwits_protocol.o: D:\keil5\ARM\ARMCC\bin\..\include\stdbool.h
+.\gizwits_protocol.o: ..\Utils\common.h
+.\gizwits_protocol.o: D:\keil5\ARM\ARMCC\bin\..\include\ctype.h
+.\gizwits_protocol.o: ..\Utils\dataPointTools.h

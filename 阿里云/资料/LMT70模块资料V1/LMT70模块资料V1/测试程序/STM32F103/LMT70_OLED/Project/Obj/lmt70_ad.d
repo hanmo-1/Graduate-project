@@ -1,0 +1,17 @@
+.\Obj\lmt70_ad.o: ..\User\lmt70_ad.c
+.\Obj\lmt70_ad.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x.h
+.\Obj\lmt70_ad.o: ..\CMSIS\CoreSupport\core_cm3.h
+.\Obj\lmt70_ad.o: C:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+.\Obj\lmt70_ad.o: ..\CMSIS\DeviceSupport\STM32F10x\system_stm32f10x.h
+.\Obj\lmt70_ad.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x_conf.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_exti.h
+.\Obj\lmt70_ad.o: ..\CMSIS\DeviceSupport\STM32F10x\stm32f10x.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_fsmc.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_pwr.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_rcc.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\misc.h
+.\Obj\lmt70_ad.o: ..\User\lmt70_ad.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h
+.\Obj\lmt70_ad.o: ..\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dma.h
+.\Obj\lmt70_ad.o: ..\User\delay.h

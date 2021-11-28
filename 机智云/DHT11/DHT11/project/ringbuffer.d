@@ -1,0 +1,9 @@
+.\ringbuffer.o: ..\Utils\ringbuffer.c
+.\ringbuffer.o: ..\Utils\ringBuffer.h
+.\ringbuffer.o: D:\keil5\ARM\ARMCC\bin\..\include\stdint.h
+.\ringbuffer.o: D:\keil5\ARM\ARMCC\bin\..\include\stdio.h
+.\ringbuffer.o: D:\keil5\ARM\ARMCC\bin\..\include\stdlib.h
+.\ringbuffer.o: D:\keil5\ARM\ARMCC\bin\..\include\string.h
+.\ringbuffer.o: ..\Utils\common.h
+.\ringbuffer.o: D:\keil5\ARM\ARMCC\bin\..\include\stdbool.h
+.\ringbuffer.o: D:\keil5\ARM\ARMCC\bin\..\include\ctype.h
